@@ -1,6 +1,3 @@
-import pygame
-
-
 def main():
 	game()
 
