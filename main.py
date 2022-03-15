@@ -82,6 +82,7 @@ def game(snake: list, apple: list):
 
 def main():
     pygame.init()
+    pygame.display.set_caption("Snake")
     clock = pygame.time.Clock()
 
     snake = [[9, 9, RIGHT], ]
