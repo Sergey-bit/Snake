@@ -88,7 +88,7 @@ def main():
             break
         draw(snake, apple)
         pygame.display.update()
-        clock(12)
+        clock(15)
     pygame.quit()
 
 
