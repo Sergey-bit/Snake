@@ -6,6 +6,12 @@ TALL = 23
 BLOCK = TALL + 2
 LEFT, RIGHT, DOWN, UP = range(4)
 LOSE = 0
+FUNCS = {
+    LEFT: [lambda x, y: [x + 1, y, LEFT], lambda last: last not in (RIGHT, LEFT)],
+    RIGHT: [lambda x, y: [x - 1, y, RIGHT], lambda last: last not in (RIGHT, LEFT)],
+    UP: [lambda x, y: [x, y + 1, UP], lambda last: last not in (UP, DOWN)],
+    DOWN: [lambda x, y: [x, y - 1, DOWN], lambda last: last not in (UP, DOWN)],
+}
 sc = pygame.display.set_mode((SIZE_W[0] * BLOCK, SIZE_W[1] * BLOCK))
 
 def draw(snake, apple):
@@ -19,27 +25,16 @@ def check(snake, block):
             return 1
     return 0
 
-def grown(snake):
-    p = snake[-1]
-    if p[2] == LEFT:
-        snake.append([p[0] + 1, p[1], p[2]])
-    elif p[2] == RIGHT:
-        snake.append([p[0] - 1, p[1], p[2]])
-    elif p[2] == UP:
-        snake.append([p[0], p[1] + 1, p[2]])
-    else:
-        snake.append([p[0], p[1] - 1, p[2]])
-
 def press(snake):
     key = pygame.key.get_pressed()
     last = snake[0][2]
-    if key[pygame.K_d] and last not in (RIGHT, LEFT):
+    if key[pygame.K_d] and FUNCS[RIGHT][1](last):
         snake[0][2] = RIGHT
-    elif key[pygame.K_w] and last not in (UP, DOWN):
+    elif key[pygame.K_w] and FUNCS[UP][1](last):
         snake[0][2] = UP
-    elif key[pygame.K_a] and last not in (RIGHT, LEFT):
+    elif key[pygame.K_a] and FUNCS[LEFT][1](last):
         snake[0][2] = LEFT
-    elif key[pygame.K_s] and last not in (UP, DOWN):
+    elif key[pygame.K_s] and FUNCS[DOWN][1](last):
         snake[0][2] = DOWN
 
 def move(snake, all_snake):
@@ -72,7 +67,7 @@ def game(snake, apple):
         while p:
             apple[0], apple[1] = randint(0, SIZE_W[0] - 1), randint(0, SIZE_W[1] - 1)
             p = check(snake, apple)
-        grown(snake)
+        snake.append(FUNCS[snake[-1][2]][0](*snake[-1][:2]))
 
 def main():
     pygame.init()
