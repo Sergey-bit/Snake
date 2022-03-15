@@ -12,6 +12,12 @@ FUNCS = {
     UP: lambda x, y: [x, y + 1, UP],
     DOWN: lambda x, y: [x, y - 1, DOWN],
 }
+FUNCS = {
+    LEFT: lambda b, snake: get_loss() if b[0] - 1 < 0 or check(snake, [b[0] - 1, b[1]]) else move(b, b[0] - 1, b[1]),
+    RIGHT: lambda b, snake: get_loss() if b[0] + 1 >= SIZE_W[0] or check(snake, [b[0] + 1, b[1]]) else move(b, b[0] + 1, b[1]),
+    UP: lambda b, snake: get_loss() if b[1] - 1 < 0 or check(snake, [b[0], b[1] - 1]) else move(b, b[0], b[1] - 1),
+    DOWN: lambda b, snake: get_loss() if b[1] >= SIZE_W[1] or check(snake, [b[0], b[1] + 1]) else move(b, b[0], b[1] + 1)
+}
 sc = pygame.display.set_mode((SIZE_W[0] * BLOCK, SIZE_W[1] * BLOCK))
 
 def draw(snake, apple):
@@ -25,6 +31,14 @@ def check(snake, block):
             return 1
     return 0
 
+def get_loss():
+    global LOSE
+    LOSE = 1
+
+def move(block, x, y):
+    block[0] = x
+    block[1] = y
+
 def press(snake):
     key = pygame.key.get_pressed()
     last = snake[0][2]
@@ -37,29 +51,10 @@ def press(snake):
     elif key[pygame.K_s] and last not in (UP, DOWN):
         snake[0][2] = DOWN
 
-def move(snake, all_snake):
-    global LOSE
-    if snake[2] == LEFT:
-        if snake[0] - 1 < 0 or check(all_snake, [snake[0] - 1, snake[1]]):
-            LOSE = 1
-        snake[0] -= 1 - LOSE
-    elif snake[2] == RIGHT:
-        if snake[0] + 1 >= SIZE_W[0] or check(all_snake, [snake[0] + 1, snake[1]]):
-            LOSE = 1
-        snake[0] += 1 - LOSE
-    elif snake[2] == UP:
-        if snake[1] - 1 < 0 or check(all_snake, [snake[0], snake[1] - 1]):
-            LOSE = 1
-        snake[1] -= 1 - LOSE
-    else:
-        if snake[1] + 1 >= SIZE_W[1] or check(all_snake, [snake[0], snake[1] + 1]):
-            LOSE = 1
-        snake[1] += 1 - LOSE
-
 def game(snake, apple):
     last = snake[0][2]
     for i in range(len(snake)):
-        move(snake[i], snake)
+        FUNCS[snake[i][2]](snake[i], snake)
         last, snake[i][2] = snake[i][2], last
     press(snake)
     if snake[0][:2] == apple:
