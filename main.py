@@ -7,10 +7,10 @@ BLOCK = TALL + 2
 LEFT, RIGHT, DOWN, UP = range(4)
 LOSE = 0
 FUNCS = {
-    LEFT: [lambda x, y: [x + 1, y, LEFT], lambda last: last not in (RIGHT, LEFT)],
-    RIGHT: [lambda x, y: [x - 1, y, RIGHT], lambda last: last not in (RIGHT, LEFT)],
-    UP: [lambda x, y: [x, y + 1, UP], lambda last: last not in (UP, DOWN)],
-    DOWN: [lambda x, y: [x, y - 1, DOWN], lambda last: last not in (UP, DOWN)],
+    LEFT: lambda x, y: [x + 1, y, LEFT],
+    RIGHT: lambda x, y: [x - 1, y, RIGHT],
+    UP: lambda x, y: [x, y + 1, UP],
+    DOWN: lambda x, y: [x, y - 1, DOWN],
 }
 sc = pygame.display.set_mode((SIZE_W[0] * BLOCK, SIZE_W[1] * BLOCK))
 
@@ -28,13 +28,13 @@ def check(snake, block):
 def press(snake):
     key = pygame.key.get_pressed()
     last = snake[0][2]
-    if key[pygame.K_d] and FUNCS[RIGHT][1](last):
+    if key[pygame.K_d] and last not in (RIGHT, LEFT):
         snake[0][2] = RIGHT
-    elif key[pygame.K_w] and FUNCS[UP][1](last):
+    elif key[pygame.K_w] and last not in (UP, DOWN):
         snake[0][2] = UP
-    elif key[pygame.K_a] and FUNCS[LEFT][1](last):
+    elif key[pygame.K_a] and last not in (RIGHT, LEFT):
         snake[0][2] = LEFT
-    elif key[pygame.K_s] and FUNCS[DOWN][1](last):
+    elif key[pygame.K_s] and last not in (UP, DOWN):
         snake[0][2] = DOWN
 
 def move(snake, all_snake):
