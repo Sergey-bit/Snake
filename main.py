@@ -67,7 +67,7 @@ def game(snake, apple):
         while p:
             apple[0], apple[1] = randint(0, SIZE_W[0] - 1), randint(0, SIZE_W[1] - 1)
             p = check(snake, apple)
-        snake.append(FUNCS[snake[-1][2]][0](*snake[-1][:2]))
+        snake.append(FUNCS[snake[-1][2]](*snake[-1][:2]))
 
 def main():
     pygame.init()
