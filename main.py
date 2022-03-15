@@ -5,15 +5,15 @@ SIZE_W = (25, 22)
 TALL = 23
 BLOCK = TALL + 2
 LEFT, RIGHT, DOWN, UP = range(4)
-LOSE, OK = range(2)
+LOSE = 0
 sc = pygame.display.set_mode((SIZE_W[0] * BLOCK, SIZE_W[1] * BLOCK))
 
 
 def check(snake: list, block: list):
     for blockOfSnake in snake:
         if blockOfSnake[:2] == block:
-            return LOSE
-    return OK
+            return 1
+    return 0
 
 
 def grown(snake: list):
@@ -42,44 +42,42 @@ def press(snake: list):
 
 
 def move(snake, all_snake):
+    global LOSE
     if snake[2] == LEFT:
-        if snake[0] - 1 < 0 or check(all_snake, [snake[0] - 1, snake[1]]) == LOSE:
-            return LOSE
+        if snake[0] - 1 < 0 or check(all_snake, [snake[0] - 1, snake[1]]):
+            LOSE = 1
         snake[0] -= 1
     elif snake[2] == RIGHT:
-        if snake[0] + 1 >= SIZE_W[0] or check(all_snake, [snake[0] + 1, snake[1]]) == LOSE:
-            return LOSE
+        if snake[0] + 1 >= SIZE_W[0] or check(all_snake, [snake[0] + 1, snake[1]]):
+            LOSE = 1
         snake[0] += 1
     elif snake[2] == UP:
-        if snake[1] - 1 < 0 or check(all_snake, [snake[0], snake[1] - 1]) == LOSE:
-            return LOSE
+        if snake[1] - 1 < 0 or check(all_snake, [snake[0], snake[1] - 1]):
+            LOSE = 1
         snake[1] -= 1
     else:
-        if snake[1] + 1 >= SIZE_W[1] or check(all_snake, [snake[0], snake[1] + 1]) == LOSE:
-            return LOSE
+        if snake[1] + 1 >= SIZE_W[1] or check(all_snake, [snake[0], snake[1] + 1]):
+            LOSE = 1
         snake[1] += 1
-    return OK
 
 
-def game(snake: list, apple: list, game_: bool):
-    if game_:
+def game(snake: list, apple: list):
+    if LOSE == 0:
         last = snake[0][2]
         for i in range(len(snake)):
-            if move(snake[i], snake) == LOSE:
-                return LOSE
-            pygame.draw.rect(sc, "white", [snake[i][0] * BLOCK, snake[i][1] * BLOCK, TALL, TALL])
+            move(snake[i], snake)
             last, snake[i][2] = snake[i][2], last
         press(snake)
-    if snake[0][:2] == apple:
-        p = LOSE
-        while p == LOSE:
-            apple[0] = randint(0, SIZE_W[0] - 1)
-            apple[1] = randint(0, SIZE_W[1] - 1)
-            p = check(snake, apple)
-        grown(snake)
+        if snake[0][:2] == apple:
+            p = 1
+            while p:
+                apple[0] = randint(0, SIZE_W[0] - 1)
+                apple[1] = randint(0, SIZE_W[1] - 1)
+                p = check(snake, apple)
+            grown(snake)
+    for i in range(len(snake)):
+        pygame.draw.rect(sc, "white", [snake[i][0] * BLOCK, snake[i][1] * BLOCK, TALL, TALL])
     pygame.draw.rect(sc, "red", [apple[0] * BLOCK, apple[1] * BLOCK, BLOCK, BLOCK])
-
-    return game_
 
 
 def main():
@@ -87,19 +85,17 @@ def main():
     clock = pygame.time.Clock()
 
     snake = [[9, 9, RIGHT], ]
-    play, pc = OK, 4
+    pc = 4
     apple = [randint(0, SIZE_W[0] - 1), randint(0, SIZE_W[1] - 1)]
 
-    while play or pc:
+    while not LOSE or pc:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
         sc.fill("black")
-        play = game(snake, apple, play)
-        if not play:
+        game(snake, apple)
+        if LOSE:
             pc -= 1
-            for i in range(len(snake)):
-                pygame.draw.rect(sc, "white", [snake[i][0] * BLOCK, snake[i][1] * BLOCK, TALL, TALL])
         pygame.display.update()
         clock.tick(12)
 
